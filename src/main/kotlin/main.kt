@@ -11,21 +11,21 @@ import kastree.ast.psi.Parser
 fun main(args: Array<String>) {
     val code = """
     package foo
-
     fun bar() {
         // Print hello
         println("Hello, World!")
     }
-
+    val x: IntArray = intArrayOf(1, 2, 3)
+    println(x[0])
     fun baz() = println("Hello, again!")
 """.trimIndent()
     val file = Parser.parseFile(code)
-
     val extrasMap = Converter.WithExtras()
     println(Writer.write(file, extrasMap))
 
     var strings = emptyList<String>()
     Visitor.visit(file) { v, _ ->
+        println (v is Node.Expr.ArrayAccess)
         if (v is Node.Expr.StringTmpl.Elem.Regular) strings += v.str
     }
     println(strings)
