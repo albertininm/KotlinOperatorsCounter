@@ -69,10 +69,12 @@ class ItemDeserializer : JsonDeserializer<Item> {
       } else {
          @Suppress("DEPRECATION")
          Html.fromHtml(html).toString().trim { it <= ' ' }
+         Html.fromHtml(html).toString().trim { it <= ' ' }
       }
       val x = "Hi";
       val y = x?.toString()
       val z = x!!.toString()
+      println(x?: y)
       println(x?: y)
 
    }
@@ -80,42 +82,53 @@ class ItemDeserializer : JsonDeserializer<Item> {
    companion object {
         @JvmStatic  // <-- notice the @JvmStatic annotation
         val someString = "hello world"
+   }
+   companion object {
+        @JvmStatic  // <-- notice the @JvmStatic annotation
+        val newString = "hello world"
+   }
+    var myFun = {x: Int -> println(x+1)}
+    var myFunc = {x: Int -> println(x+1)}
+    var myFunct = {x: Int -> println(x+1)}
+
+    fun doNothing() {
+        println(2..4)
     }
-
-
 }
 """.trimIndent()
 
     val file = Parser.parseFile(code)
-    var strings = emptyList<String>()
 
     var map: MutableMap<String, Int?> = mutableMapOf()
+    val operators= arrayOf("Token(token=DOT_SAFE)", "Token(token=ELVIS)", "Token(token=RANGE)")
     Visitor.visit(file) { v, _ ->
-//        println("ITEM " + v.toString())
+        println(v.toString())
 
-        if (v is Node.Expr.UnaryOp) {
-            val oper = v.oper.token
-            if(oper == Node.Expr.UnaryOp.Token.NULL_DEREF) {
-                map = updateMap(oper.toString(), map)
+        when {
+            v is Node.Expr.UnaryOp -> {
+                val oper = v.oper.token
+                if(oper == Node.Expr.UnaryOp.Token.NULL_DEREF) {
+                    map = updateMap(oper.toString(), map)
+                }
             }
 
-        }
-        if(v is Node.Expr.BinaryOp){
-            val oper = v.oper.toString()
-            if(oper == "Token(token=DOT_SAFE)"){
+            v is Node.Decl.Structured -> {
+                val oper = v.form
+                if(oper == Node.Decl.Structured.Form.COMPANION_OBJECT){
+                    map = updateMap(oper.toString(), map)
+                }
+            }
+
+            v is Node.Expr.Call.TrailLambda -> {
+                val oper = "TRAIL_LAMBDA"
                 map = updateMap(oper, map)
             }
-        }
-        if (v is Node.Expr.BinaryOp) {
-            val oper = v.oper.toString()
-            if(oper == "Token(token=ELVIS)"){
-                map = updateMap(oper, map)
-            }
-        }
-        if (v is Node.Decl.Structured) {
-            val oper = v.form
-            if(oper == Node.Decl.Structured.Form.COMPANION_OBJECT){
-                map = updateMap(oper.toString(), map)
+
+            v is Node.Expr.BinaryOp -> {
+                val oper = v.oper.toString()
+                if(operators.contains(oper)) {
+                    map = updateMap(oper, map)
+                }
             }
         }
     }
