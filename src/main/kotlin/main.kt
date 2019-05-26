@@ -3,14 +3,12 @@
  */
 import Constants.Companion.operators
 import Constants.Companion.scopingFunction
-import kastree.ast.MutableVisitor
 import kastree.ast.Node
 import kastree.ast.Visitor
-import kastree.ast.Writer
-import kastree.ast.psi.Converter
 import kastree.ast.psi.Parser
 import java.io.File
 import java.io.BufferedReader
+import java.io.FileWriter
 
 
 //Adds updateMap to MutableMap class
@@ -26,8 +24,8 @@ fun MutableMap<String, Int?>.updateMap(oper: String, map: MutableMap<String, Int
 
 
 fun main(args: Array<String>) {
-    val bufferedReader: BufferedReader = File("/Users/albertinin/Documents/TCC/repo-mining/example.kt").bufferedReader()
 
+    val bufferedReader: BufferedReader = File("/Users/albertinin/Documents/TCC/repo-mining/example.kt").bufferedReader()
     val inputString = bufferedReader.use { it.readText() }
     println(inputString)
 
@@ -36,6 +34,12 @@ fun main(args: Array<String>) {
 
     visit(file, map)
     println(map.toString())
+
+    val newFile = File("/Users/albertinin/Documents/text.txt")
+    val fileWriter = FileWriter(newFile)
+    fileWriter.write(map.toString())
+    fileWriter.flush()
+    fileWriter.close()
 }
 
 fun visit(file: Node.File, map: MutableMap<String, Int?>){
