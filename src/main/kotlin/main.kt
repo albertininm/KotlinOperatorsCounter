@@ -22,24 +22,50 @@ fun MutableMap<String, Int?>.updateMap(oper: String, map: MutableMap<String, Int
     return map
 }
 
+var globalMap: MutableMap<String, Int?> = mutableMapOf()
 
 fun main(args: Array<String>) {
 
-    val bufferedReader: BufferedReader = File("/Users/albertinin/Documents/TCC/repo-mining/example.kt").bufferedReader()
-    val inputString = bufferedReader.use { it.readText() }
-    println(inputString)
+    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code")
+    val listOfFiles = folder.listFiles()
 
+    val qtdOfFiles = listOfFiles.size
+    var  notCompiled = 0
+
+    for (file in listOfFiles) {
+        if (file.isFile) {
+            try {
+                runAnalysis(file.absolutePath)
+            } catch (error: Exception) {
+                println("File could not be compiled!")
+                notCompiled++
+            }
+        }
+    }
+    println("Qtd total: " + qtdOfFiles)
+    println("Not compiled: " + notCompiled)
+
+    println("Global: "+ globalMap.toString())
+
+}
+
+fun runAnalysis(path: String){
+    val bufferedReader: BufferedReader = File(path).bufferedReader()
+    val inputString = bufferedReader.use { it.readText() }
     val file = Parser.parseFile(inputString)
     val map: MutableMap<String, Int?> = mutableMapOf()
 
     visit(file, map)
-    println(map.toString())
 
-    val newFile = File("/Users/albertinin/Documents/text.txt")
-    val fileWriter = FileWriter(newFile)
-    fileWriter.write(map.toString())
-    fileWriter.flush()
-    fileWriter.close()
+
+    val fileName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+    if(!map.isEmpty()) {
+        val newFile = File("/Users/albertinin/Documents/test/"+fileName+".json")
+        val fileWriter = FileWriter(newFile)
+        fileWriter.write(map.toString())
+        fileWriter.flush()
+        fileWriter.close()
+    }
 }
 
 fun visit(file: Node.File, map: MutableMap<String, Int?>){
@@ -49,6 +75,7 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val oper = v.oper.token
                 if(oper == Node.Expr.UnaryOp.Token.NULL_DEREF) {
                     map.updateMap(oper.toString(), map)
+                    globalMap.updateMap(oper.toString(), map)
                 }
             }
 
@@ -56,22 +83,26 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val oper = v.form
                 if(oper == Node.Decl.Structured.Form.COMPANION_OBJECT){
                     map.updateMap(oper.toString(), map)
+                    globalMap.updateMap(oper.toString(), map)
                 }
             }
 
             v is Node.Expr.Call.TrailLambda -> {
                 val oper = "TRAIL_LAMBDA"
                 map.updateMap(oper, map)
+                globalMap.updateMap(oper, map)
             }
 
             v is Node.Expr.BinaryOp -> {
                 val oper = v.oper.toString()
                 if(operators.contains(oper)) {
                     map.updateMap(oper, map)
+                    globalMap.updateMap(oper, map)
                 }
 
                 if((oper == "Token(token=NEQ)") && (v.rhs.toString() == "Const(value=null, form=NULL)")){
                     map.updateMap("(!= null)", map)
+                    globalMap.updateMap("(!= null)", map)
                 }
             }
 
@@ -79,6 +110,7 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val scopeFunction = v.expr.toString()
                 if(scopingFunction.contains(scopeFunction)){
                     map.updateMap(scopeFunction, map)
+                    globalMap.updateMap(scopeFunction, map)
                 }
             }
         }
