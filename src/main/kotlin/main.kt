@@ -42,10 +42,19 @@ fun main(args: Array<String>) {
             }
         }
     }
-    println("Qtd total: " + qtdOfFiles)
-    println("Not compiled: " + notCompiled)
 
-    println("Global: "+ globalMap.toString())
+    val newFile = File("/Users/albertinin/Documents/test/globalResult.json")
+    val fileWriter = FileWriter(newFile)
+    fileWriter.appendln("Number of files: " + qtdOfFiles)
+    fileWriter.appendln("Not compiled: " + notCompiled)
+    fileWriter.appendln("Global: \""+ globalMap.toString()+"\"")
+    fileWriter.flush()
+    fileWriter.close()
+
+//    println("Number of files: " + qtdOfFiles)
+//    println("Not compiled: " + notCompiled)
+//
+//    println("Global: "+ globalMap.toString())
 
 }
 
@@ -56,7 +65,6 @@ fun runAnalysis(path: String){
     val map: MutableMap<String, Int?> = mutableMapOf()
 
     visit(file, map)
-
 
     val fileName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
     if(!map.isEmpty()) {
@@ -75,7 +83,7 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val oper = v.oper.token
                 if(oper == Node.Expr.UnaryOp.Token.NULL_DEREF) {
                     map.updateMap(oper.toString(), map)
-                    globalMap.updateMap(oper.toString(), map)
+                    globalMap.updateMap(oper.toString(), globalMap)
                 }
             }
 
@@ -83,26 +91,26 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val oper = v.form
                 if(oper == Node.Decl.Structured.Form.COMPANION_OBJECT){
                     map.updateMap(oper.toString(), map)
-                    globalMap.updateMap(oper.toString(), map)
+                    globalMap.updateMap(oper.toString(), globalMap)
                 }
             }
 
             v is Node.Expr.Call.TrailLambda -> {
                 val oper = "TRAIL_LAMBDA"
                 map.updateMap(oper, map)
-                globalMap.updateMap(oper, map)
+                globalMap.updateMap(oper, globalMap)
             }
 
             v is Node.Expr.BinaryOp -> {
                 val oper = v.oper.toString()
                 if(operators.contains(oper)) {
                     map.updateMap(oper, map)
-                    globalMap.updateMap(oper, map)
+                    globalMap.updateMap(oper, globalMap)
                 }
 
                 if((oper == "Token(token=NEQ)") && (v.rhs.toString() == "Const(value=null, form=NULL)")){
                     map.updateMap("(!= null)", map)
-                    globalMap.updateMap("(!= null)", map)
+                    globalMap.updateMap("(!= null)", globalMap)
                 }
             }
 
@@ -110,7 +118,7 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
                 val scopeFunction = v.expr.toString()
                 if(scopingFunction.contains(scopeFunction)){
                     map.updateMap(scopeFunction, map)
-                    globalMap.updateMap(scopeFunction, map)
+                    globalMap.updateMap(scopeFunction, globalMap)
                 }
             }
         }
