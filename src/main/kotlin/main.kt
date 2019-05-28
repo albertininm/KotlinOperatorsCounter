@@ -39,7 +39,7 @@ var globalMap: MutableMap<String, Int?> = mutableMapOf()
 
 
 fun main(args: Array<String>) {
-    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code-test")
+    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code")
     val listOfFiles = folder.listFiles()
 
     val qtdOfFiles = listOfFiles.size
@@ -85,11 +85,11 @@ fun runAnalysis(file: File){
 
     if(!map.isEmpty()) {
         updateCsv(map, fileName)
-//        val newFile = File("/Users/albertinin/Documents/TCC/result-mining/"+fileName+".json")
-//        val fileWriter = FileWriter(newFile)
-//        fileWriter.write(map.toString())
-//        fileWriter.flush()
-//        fileWriter.close()
+        val newFile = File("/Users/albertinin/Documents/TCC/result-mining/"+fileName+".json")
+        val fileWriter = FileWriter(newFile)
+        fileWriter.write(map.toString())
+        fileWriter.flush()
+        fileWriter.close()
     }
 }
 
