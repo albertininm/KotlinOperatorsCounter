@@ -21,21 +21,36 @@ fun MutableMap<String, Int?>.updateMap(oper: String, map: MutableMap<String, Int
     }
     return map
 }
+val allOperators = arrayOf(
+    "(!= null)",
+    "TRAIL_LAMBDA",
+    "COMPANION_OBJECT",
+    "NULL_DEREF",
+    "Token(token=DOT_SAFE)",
+    "Token(token=ELVIS)",
+    "Token(token=RANGE)",
+    "Name(name=run)",
+    "Name(name=let)",
+    "Name(name=also)",
+    "Name(name=apply)",
+    "Name(name=with)")
 
 var globalMap: MutableMap<String, Int?> = mutableMapOf()
 
-fun main(args: Array<String>) {
 
-    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code")
+fun main(args: Array<String>) {
+    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code-test")
     val listOfFiles = folder.listFiles()
 
     val qtdOfFiles = listOfFiles.size
     var  notCompiled = 0
 
+    initCsv()
+
     for (file in listOfFiles) {
         if (file.isFile) {
             try {
-                runAnalysis(file.absolutePath)
+                runAnalysis(file)
             } catch (error: Exception) {
                 println("File could not be compiled!")
                 notCompiled++
@@ -43,36 +58,38 @@ fun main(args: Array<String>) {
         }
     }
 
-    val newFile = File("/Users/albertinin/Documents/test/globalResult.json")
+    val newFile= File("/Users/albertinin/Documents/TCC/result-mining/globalResult.json")
     val fileWriter = FileWriter(newFile)
-    fileWriter.appendln("Number of files: " + qtdOfFiles)
-    fileWriter.appendln("Not compiled: " + notCompiled)
+    fileWriter.appendln("Number of files: " + qtdOfFiles + ",\n")
+    fileWriter.appendln("Not compiled: " + notCompiled + ",\n")
     fileWriter.appendln("Global: \""+ globalMap.toString()+"\"")
     fileWriter.flush()
     fileWriter.close()
+    println("Number of files: " + qtdOfFiles)
+    println("Not compiled: " + notCompiled)
+    updateCsv(globalMap, "Total")
 
-//    println("Number of files: " + qtdOfFiles)
-//    println("Not compiled: " + notCompiled)
-//
-//    println("Global: "+ globalMap.toString())
 
 }
 
-fun runAnalysis(path: String){
+fun runAnalysis(file: File){
+    val path = file.absolutePath
     val bufferedReader: BufferedReader = File(path).bufferedReader()
     val inputString = bufferedReader.use { it.readText() }
-    val file = Parser.parseFile(inputString)
+    val fileCode = Parser.parseFile(inputString)
     val map: MutableMap<String, Int?> = mutableMapOf()
 
-    visit(file, map)
+    visit(fileCode, map)
 
     val fileName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+
     if(!map.isEmpty()) {
-        val newFile = File("/Users/albertinin/Documents/test/"+fileName+".json")
-        val fileWriter = FileWriter(newFile)
-        fileWriter.write(map.toString())
-        fileWriter.flush()
-        fileWriter.close()
+        updateCsv(map, fileName)
+//        val newFile = File("/Users/albertinin/Documents/TCC/result-mining/"+fileName+".json")
+//        val fileWriter = FileWriter(newFile)
+//        fileWriter.write(map.toString())
+//        fileWriter.flush()
+//        fileWriter.close()
     }
 }
 
@@ -123,4 +140,39 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
             }
         }
     }
+}
+
+
+fun initCsv() {
+    val newFile = File("/Users/albertinin/Documents/TCC/result-mining/globalResult.csv")
+    val fileWriter = FileWriter(newFile, true)
+    for (operator in allOperators) {
+        fileWriter.append(operator)
+        fileWriter.append(',')
+    }
+    fileWriter.append("filename")
+    fileWriter.append("\n")
+    fileWriter.flush()
+    fileWriter.close()
+}
+
+fun updateCsv(map: MutableMap<String, Int?>, fileName: String) {
+    val newFile = File("/Users/albertinin/Documents/TCC/result-mining/globalResult.csv")
+    val fileWriter = FileWriter(newFile, true)
+    for (operator in allOperators) {
+        if(map.containsKey(operator)){
+            fileWriter.append(map.getValue(operator).toString())
+        }
+        else {
+            fileWriter.append("0")
+        }
+        fileWriter.append(',')
+
+    }
+
+
+    fileWriter.append(fileName)
+    fileWriter.append("\n")
+    fileWriter.flush()
+    fileWriter.close()
 }
