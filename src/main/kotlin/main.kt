@@ -1,6 +1,7 @@
 /**
  *
  */
+import Constants.Companion.allOperators
 import Constants.Companion.operators
 import Constants.Companion.scopingFunction
 import kastree.ast.Node
@@ -21,19 +22,7 @@ fun MutableMap<String, Int?>.updateMap(oper: String, map: MutableMap<String, Int
     }
     return map
 }
-val allOperators = arrayOf(
-    "(!= null)",
-    "TRAIL_LAMBDA",
-    "COMPANION_OBJECT",
-    "NULL_DEREF",
-    "Token(token=DOT_SAFE)",
-    "Token(token=ELVIS)",
-    "Token(token=RANGE)",
-    "Name(name=run)",
-    "Name(name=let)",
-    "Name(name=also)",
-    "Name(name=apply)",
-    "Name(name=with)")
+
 
 var globalMap: MutableMap<String, Int?> = mutableMapOf()
 
@@ -84,7 +73,6 @@ fun runAnalysis(file: File){
     val fileName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
 
     if(!map.isEmpty()) {
-        updateCsv(map, fileName)
         val newFile = File("/Users/albertinin/Documents/TCC/result-mining/"+fileName+".json")
         val fileWriter = FileWriter(newFile)
         fileWriter.write(map.toString())
