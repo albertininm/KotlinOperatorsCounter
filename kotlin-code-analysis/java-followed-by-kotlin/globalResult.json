@@ -1,0 +1,5 @@
+Number of files: 6869,
+
+Not compiled: 928,
+
+Global: "{TRAIL_LAMBDA=8827, COMPANION_OBJECT=1510, (!= null)=2249, NULL_DEREF=5537, Name(name=with)=463, Name(name=apply)=708, Token(token=DOT_SAFE)=4065, Name(name=let)=859, Token(token=RANGE)=200, Token(token=ELVIS)=886, Name(name=also)=104, Name(name=run)=245}"

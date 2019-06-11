@@ -14,6 +14,7 @@ class Constants{
             "Name(name=let)",
             "Name(name=also)",
             "Name(name=apply)",
-            "Name(name=with)")
+            "Name(name=with)"
+        )
     }
 }

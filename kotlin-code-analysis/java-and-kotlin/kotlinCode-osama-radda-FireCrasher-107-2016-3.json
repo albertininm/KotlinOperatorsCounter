@@ -1,0 +1,1 @@
+{(!= null)=2, NULL_DEREF=6, Token(token=DOT_SAFE)=2, COMPANION_OBJECT=1}

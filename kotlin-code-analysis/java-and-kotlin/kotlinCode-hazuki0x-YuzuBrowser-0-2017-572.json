@@ -1,0 +1,1 @@
+{Token(token=DOT_SAFE)=2, Name(name=run)=1, TRAIL_LAMBDA=3, Token(token=ELVIS)=6, Name(name=apply)=2, NULL_DEREF=3, COMPANION_OBJECT=2, (!= null)=1}

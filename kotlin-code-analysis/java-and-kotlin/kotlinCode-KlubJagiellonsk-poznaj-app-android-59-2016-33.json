@@ -1,0 +1,1 @@
+{(!= null)=1, NULL_DEREF=5, COMPANION_OBJECT=1}

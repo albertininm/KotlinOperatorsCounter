@@ -1,0 +1,1 @@
+{TRAIL_LAMBDA=16, Token(token=DOT_SAFE)=5, Name(name=let)=1, Name(name=run)=3, (!= null)=4, NULL_DEREF=3, Token(token=ELVIS)=4, Name(name=apply)=2, COMPANION_OBJECT=1}

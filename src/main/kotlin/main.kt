@@ -14,12 +14,12 @@ import java.io.FileWriter
 
 //Adds updateMap to MutableMap class
 fun MutableMap<String, Int?>.updateMap(oper: String, map: MutableMap<String, Int?>): MutableMap<String, Int?> {
-    val currentValue = map.get(oper)
-    if(currentValue != null) {
-        map[oper] = currentValue + 1
-    } else {
-        map[oper] = 1
-    }
+//    val currentValue = map.get(oper)
+//    if(currentValue != null) {
+//        map[oper] = currentValue + 1
+//    } else {
+//        map[oper] = 1
+//    }
     return map
 }
 
@@ -28,35 +28,56 @@ var globalMap: MutableMap<String, Int?> = mutableMapOf()
 
 
 fun main(args: Array<String>) {
-    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code")
+    val folder = File("/Users/albertinin/Documents/TCC/rn-doctor/kotlin-code-new")
     val listOfFiles = folder.listFiles()
 
     val qtdOfFiles = listOfFiles.size
     var  notCompiled = 0
 
-    initCsv()
+//    val file = """
+//
+//
+//    object DataProviderManager {
+//    fun registerDataProvider(provider: DataProvider) {
+//        println("asd")
+//    }
+//    }
+//        """
+//    val fileCode = Parser.parseFile(file)
+//    Visitor.visit(fileCode) { v, _ ->
+//        Node.Decl.Structured.Form.OBJECT
+//        println(v)
+//    }
 
+//    initCsv()
+
+    val errors = File("/Users/albertinin/Documents/TCC/kotlin-code-analysis/errorJavaAndKotlinFiles.csv")
+    val fileWriterError = FileWriter(errors, true)
     for (file in listOfFiles) {
         if (file.isFile) {
             try {
                 runAnalysis(file)
             } catch (error: Exception) {
                 println("File could not be compiled!")
+                fileWriterError.append(file.name+"\n")
+                println(file.name)
                 notCompiled++
             }
         }
     }
+    fileWriterError.flush()
+    fileWriterError.close()
 
-    val newFile= File("/Users/albertinin/Documents/TCC/result-mining/globalResult.json")
-    val fileWriter = FileWriter(newFile)
-    fileWriter.appendln("Number of files: " + qtdOfFiles + ",\n")
-    fileWriter.appendln("Not compiled: " + notCompiled + ",\n")
-    fileWriter.appendln("Global: \""+ globalMap.toString()+"\"")
-    fileWriter.flush()
-    fileWriter.close()
-    println("Number of files: " + qtdOfFiles)
-    println("Not compiled: " + notCompiled)
-    updateCsv(globalMap, "Total")
+//    val newFile= File("/Users/albertinin/Documents/TCC/kotlin-code-analysis/java-followed-by-kotlin/globalResult.json")
+//    val fileWriter = FileWriter(newFile)
+//    fileWriter.appendln("Number of files: " + qtdOfFiles + ",\n")
+//    fileWriter.appendln("Not compiled: " + notCompiled + ",\n")
+//    fileWriter.appendln("Global: \""+ globalMap.toString()+"\"")
+//    fileWriter.flush()
+//    fileWriter.close()
+//    println("Number of files: " + qtdOfFiles)
+//    println("Not compiled: " + notCompiled)
+//    updateCsv(globalMap, "Total")
 
 
 }
@@ -71,14 +92,15 @@ fun runAnalysis(file: File){
     visit(fileCode, map)
 
     val fileName = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-
-    if(!map.isEmpty()) {
-        val newFile = File("/Users/albertinin/Documents/TCC/result-mining/"+fileName+".json")
-        val fileWriter = FileWriter(newFile)
-        fileWriter.write(map.toString())
-        fileWriter.flush()
-        fileWriter.close()
-    }
+//    updateCsv(map, fileName)
+//
+//    if(!map.isEmpty()) {
+//        val newFile = File("/Users/albertinin/Documents/TCC/kotlin-code-analysis/java-followed-by-kotlin/"+fileName+".json")
+//        val fileWriter = FileWriter(newFile)
+//        fileWriter.write(map.toString())
+//        fileWriter.flush()
+//        fileWriter.close()
+//    }
 }
 
 fun visit(file: Node.File, map: MutableMap<String, Int?>){
@@ -132,7 +154,7 @@ fun visit(file: Node.File, map: MutableMap<String, Int?>){
 
 
 fun initCsv() {
-    val newFile = File("/Users/albertinin/Documents/TCC/result-mining/globalResult.csv")
+    val newFile = File("/Users/albertinin/Documents/TCC/kotlin-code-analysis/java-followed-by-kotlin/globalResult.csv")
     val fileWriter = FileWriter(newFile, true)
     for (operator in allOperators) {
         fileWriter.append(operator)
@@ -145,7 +167,7 @@ fun initCsv() {
 }
 
 fun updateCsv(map: MutableMap<String, Int?>, fileName: String) {
-    val newFile = File("/Users/albertinin/Documents/TCC/result-mining/globalResult.csv")
+    val newFile = File("/Users/albertinin/Documents/TCC/kotlin-code-analysis/java-followed-by-kotlin/globalResult.csv")
     val fileWriter = FileWriter(newFile, true)
     for (operator in allOperators) {
         if(map.containsKey(operator)){
